@@ -227,7 +227,7 @@ async def _set_type_and_load(ex, market_type: str) -> bool:
         await ex.load_markets(reload=True)
         return True
     except Exception as e:  # noqa: BLE001
-        log.warning("%s load_markets(%s) failed: %s", ex.id, market_type, e)
+        log.warning("%s load_markets(%s) failed [%s]: %s", ex.id, market_type, type(e).__name__, e)
         return False
 
 
@@ -243,7 +243,7 @@ async def _fetch_spot(ex, name: str) -> list[Ticker]:
     try:
         tickers = await ex.fetch_tickers(list(relevant.keys()))
     except Exception as e:  # noqa: BLE001
-        log.warning("%s spot fetch_tickers failed: %s", name, e)
+        log.warning("%s spot fetch_tickers failed [%s]: %s", name, type(e).__name__, e)
         return []
     out: list[Ticker] = []
     for sym, t in tickers.items():
@@ -270,7 +270,7 @@ async def _fetch_perp(ex, name: str) -> list[Ticker]:
     try:
         tickers = await ex.fetch_tickers(list(relevant.keys()))
     except Exception as e:  # noqa: BLE001
-        log.warning("%s perp fetch_tickers failed: %s", name, e)
+        log.warning("%s perp fetch_tickers failed [%s]: %s", name, type(e).__name__, e)
         return []
 
     funding_map: dict[str, float] = {}
@@ -283,7 +283,7 @@ async def _fetch_perp(ex, name: str) -> list[Ticker]:
                     funding_map[sym] = float(fr["fundingRate"])
                 interval_map[sym] = _funding_interval(fr)
         except Exception as e:  # noqa: BLE001
-            log.warning("%s fetch_funding_rates failed: %s", name, e)
+            log.warning("%s fetch_funding_rates failed [%s]: %s", name, type(e).__name__, e)
 
     out: list[Ticker] = []
     for sym, m in relevant.items():
@@ -314,7 +314,7 @@ async def _fetch_futures(ex, name: str) -> list[Ticker]:
     try:
         tickers = await ex.fetch_tickers(list(relevant.keys()))
     except Exception as e:  # noqa: BLE001
-        log.warning("%s futures fetch_tickers failed: %s", name, e)
+        log.warning("%s futures fetch_tickers failed [%s]: %s", name, type(e).__name__, e)
         return []
     out: list[Ticker] = []
     for sym, m in relevant.items():
