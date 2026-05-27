@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>Crypto Arbitrage Live Dashboard</title>
+<link rel="stylesheet" href="/static/style.css" />
+<script src="/static/i18n.js"></script>
+</head>
+<body>
+<header>
+  <div class="row">
+    <h1 data-i18n="title">Crypto Arbitrage Live Dashboard</h1>
+    <span id="status" class="badge offline" data-i18n="status_connecting">Connecting…</span>
+    <span id="updated" class="muted"></span>
+    <span id="stats" class="muted"></span>
+    <span id="errors"></span>
+    <button id="lang-toggle" class="lang-btn" data-i18n="lang_toggle">中文</button>
+  </div>
+  <div class="row controls">
+    <input id="search" type="search" data-i18n-placeholder="search_placeholder"
+           placeholder="Filter coin (e.g. PEPE)" autocomplete="off" />
+    <label class="muted">
+      <span data-i18n="min_volume_label">Min 24h volume</span>
+      <select id="min-volume">
+        <option value="0" data-i18n="vol_any">Any</option>
+        <option value="100000" data-i18n="vol_100k">100K</option>
+        <option value="1000000" selected data-i18n="vol_1m">1M</option>
+        <option value="10000000" data-i18n="vol_10m">10M</option>
+        <option value="100000000" data-i18n="vol_100m">100M</option>
+      </select>
+    </label>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="divergence" data-i18n="tab_divergence">⭐ Funding Divergence</button>
+  <button class="tab" data-tab="funding" data-i18n="tab_funding">Funding (Single Ex)</button>
+  <button class="tab" data-tab="basis" data-i18n="tab_basis">Spot–Futures Basis</button>
+  <button class="tab" data-tab="cross_perp" data-i18n="tab_cross_perp">Cross-Ex Spread (Perp)</button>
+  <button class="tab" data-tab="cross_spot" data-i18n="tab_cross_spot">Cross-Ex Spread (Spot)</button>
+</nav>
+
+<section id="divergence" class="panel active">
+  <p class="hint" data-i18n="hint_divergence"></p>
+  <table>
+    <thead><tr>
+      <th data-sort="symbol" data-i18n="col_symbol"></th>
+      <th data-sort="long_ex" data-i18n="col_long_ex"></th>
+      <th data-sort="long_rate" class="num" data-i18n="col_long_rate"></th>
+      <th data-sort="long_interval_h" class="num" data-i18n="col_interval"></th>
+      <th data-sort="short_ex" data-i18n="col_short_ex"></th>
+      <th data-sort="short_rate" class="num" data-i18n="col_short_rate"></th>
+      <th data-sort="short_interval_h" class="num" data-i18n="col_interval"></th>
+      <th data-sort="spread_per_8h_pct" class="num" data-i18n="col_spread_8h"></th>
+      <th data-sort="spread_apr_pct" class="num desc" data-i18n="col_apr"></th>
+      <th data-sort="min_volume_usd" class="num" data-i18n="col_min_volume"></th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="funding" class="panel">
+  <p class="hint" data-i18n="hint_funding"></p>
+  <table>
+    <thead><tr>
+      <th data-sort="exchange" data-i18n="col_exchange"></th>
+      <th data-sort="symbol" data-i18n="col_symbol"></th>
+      <th data-sort="spot" class="num" data-i18n="col_spot"></th>
+      <th data-sort="perp" class="num" data-i18n="col_perp"></th>
+      <th data-sort="basis_pct" class="num" data-i18n="col_basis_pct"></th>
+      <th data-sort="funding_rate" class="num" data-i18n="col_funding_rate"></th>
+      <th data-sort="funding_interval_hours" class="num" data-i18n="col_interval"></th>
+      <th data-sort="funding_apr_pct" class="num desc" data-i18n="col_funding_apr"></th>
+      <th data-sort="volume_usd" class="num" data-i18n="col_volume"></th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="basis" class="panel">
+  <p class="hint" data-i18n="hint_basis"></p>
+  <table>
+    <thead><tr>
+      <th data-sort="exchange" data-i18n="col_exchange"></th>
+      <th data-sort="symbol" data-i18n="col_symbol"></th>
+      <th data-sort="spot" class="num" data-i18n="col_spot"></th>
+      <th data-sort="future_price" class="num" data-i18n="col_future"></th>
+      <th data-sort="days_to_expiry" class="num" data-i18n="col_days_to_expiry"></th>
+      <th data-sort="basis_pct" class="num" data-i18n="col_basis_pct"></th>
+      <th data-sort="annualized_pct" class="num desc" data-i18n="col_annualized"></th>
+      <th data-sort="volume_usd" class="num" data-i18n="col_volume"></th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="cross_perp" class="panel">
+  <p class="hint" data-i18n="hint_cross_perp"></p>
+  <table>
+    <thead><tr>
+      <th data-sort="symbol" data-i18n="col_symbol"></th>
+      <th data-sort="cheapest_ex" data-i18n="col_buy_ex"></th>
+      <th data-sort="cheapest_ask" class="num" data-i18n="col_buy_price"></th>
+      <th data-sort="richest_ex" data-i18n="col_sell_ex"></th>
+      <th data-sort="richest_bid" class="num" data-i18n="col_sell_price"></th>
+      <th data-sort="spread_pct" class="num desc" data-i18n="col_spread"></th>
+      <th data-sort="min_volume_usd" class="num" data-i18n="col_min_volume"></th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="cross_spot" class="panel">
+  <p class="hint" data-i18n="hint_cross_spot"></p>
+  <table>
+    <thead><tr>
+      <th data-sort="symbol" data-i18n="col_symbol"></th>
+      <th data-sort="cheapest_ex" data-i18n="col_buy_ex"></th>
+      <th data-sort="cheapest_ask" class="num" data-i18n="col_buy_price"></th>
+      <th data-sort="richest_ex" data-i18n="col_sell_ex"></th>
+      <th data-sort="richest_bid" class="num" data-i18n="col_sell_price"></th>
+      <th data-sort="spread_pct" class="num desc" data-i18n="col_spread"></th>
+      <th data-sort="min_volume_usd" class="num" data-i18n="col_min_volume"></th>
+    </tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
