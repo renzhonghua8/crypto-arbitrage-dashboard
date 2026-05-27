@@ -2,8 +2,11 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import logging
+import os
+import secrets
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from pathlib import Path
@@ -13,7 +16,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from arbitrage import build_report
-from exchanges import fetch_all
+from exchanges import fetch_all  # also runs _load_dotenv() as a side-effect
 
 logging.basicConfig(
     level=logging.INFO,
@@ -112,7 +115,52 @@ async def lifespan(_: FastAPI):
             pass
 
 
+class BasicAuthMiddleware:
+    """Raw-ASGI middleware that enforces HTTP Basic Auth on every request,
+    including WebSocket upgrades. Activates only when AUTH_USER + AUTH_PASS
+    are set in the environment — otherwise it's a no-op."""
+
+    def __init__(self, app, user: str, password: str) -> None:
+        self.app = app
+        token = base64.b64encode(f"{user}:{password}".encode()).decode()
+        self._expected = f"Basic {token}"
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] not in ("http", "websocket"):
+            await self.app(scope, receive, send)
+            return
+        header_val = ""
+        for name, value in scope.get("headers", []):
+            if name == b"authorization":
+                header_val = value.decode("latin-1")
+                break
+        if not header_val or not secrets.compare_digest(header_val, self._expected):
+            if scope["type"] == "http":
+                await send({
+                    "type": "http.response.start",
+                    "status": 401,
+                    "headers": [
+                        (b"content-type", b"text/plain; charset=utf-8"),
+                        (b"www-authenticate", b'Basic realm="crypto-arb"'),
+                    ],
+                })
+                await send({"type": "http.response.body", "body": b"Unauthorized"})
+            else:
+                # ws — close with policy violation
+                await send({"type": "websocket.close", "code": 1008})
+            return
+        await self.app(scope, receive, send)
+
+
 app = FastAPI(lifespan=lifespan, title="Crypto Arbitrage Dashboard")
+
+_auth_user = os.environ.get("AUTH_USER")
+_auth_pass = os.environ.get("AUTH_PASS")
+if _auth_user and _auth_pass:
+    app.add_middleware(BasicAuthMiddleware, user=_auth_user, password=_auth_pass)
+    log.info("Basic Auth enabled (user=%r)", _auth_user)
+else:
+    log.warning("AUTH_USER/AUTH_PASS not set — dashboard is unauthenticated")
 
 
 @app.get("/", response_class=HTMLResponse)

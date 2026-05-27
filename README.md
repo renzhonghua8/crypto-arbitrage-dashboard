@@ -1,6 +1,6 @@
 # Crypto Arbitrage Live Dashboard
 
-> [中文文档](README.zh.md) · English
+> [中文文档](README.zh.md) · English · [Deploy to Windows / 部署到 Windows](DEPLOY.md)
 
 Real-time crypto arbitrage opportunity scanner. Pulls every USDT-quoted spot,
 linear perpetual and dated futures market across **Binance / OKX / Bybit /

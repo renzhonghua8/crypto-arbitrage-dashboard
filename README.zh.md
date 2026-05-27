@@ -1,6 +1,6 @@
 # 加密货币套利实时监控面板
 
-> 中文 · [English](README.md)
+> 中文 · [English](README.md) · [Windows 服务器部署指南](DEPLOY.zh.md)
 
 实时扫描加密货币跨交易所套利机会。覆盖 **Binance / OKX / Bybit / Gate.io /
 Bitget** 五家交易所的全部 USDT 现货 / 线性永续 / 交割合约，计算五类套利收益
