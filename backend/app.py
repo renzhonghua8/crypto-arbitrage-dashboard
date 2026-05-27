@@ -7,9 +7,20 @@ import json
 import logging
 import os
 import secrets
+import sys
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from pathlib import Path
+
+# Make local sibling modules importable regardless of how uvicorn is invoked.
+# Works for both:
+#   uvicorn app:app --app-dir backend       (legacy style)
+#   uvicorn backend.app:app                 (run from project root)
+# Also defeats accidental shadowing if the user pip-installed an unrelated
+# package named "arbitrage" or "exchanges".
+_HERE = Path(__file__).resolve().parent
+if str(_HERE) not in sys.path:
+    sys.path.insert(0, str(_HERE))
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
